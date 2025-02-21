@@ -2,16 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { PlayerStats } from '../types/ApiTypes';
 import { PlayerCard } from './PlayerCard';
 import { PlayerSearch } from './PlayerSearch';
+import { LoadingSpinner } from './LoadingSpinner';
 
 export const Leaderboard: React.FC = () => {
     const [players, setPlayers] = useState<PlayerStats[]>([]);
     const [sort, setSort] = useState<'kills' | 'xp'>('kills');
     const [activeTab, setActiveTab] = useState<'leaderboard' | 'search'>('leaderboard');
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        setLoading(true);
         fetch(`https://api.hglabor.de/stats/ffa/top?sort=${sort}`)
             .then(res => res.json())
-            .then(data => setPlayers(data));
+            .then(data => setPlayers(data))
+            .finally(() => setLoading(false));
     }, [sort]);
 
     return (
@@ -38,9 +42,13 @@ export const Leaderboard: React.FC = () => {
                         <option value="xp">Sort by XP</option>
                     </select>
                     <div className="players-grid">
-                        {players.map(player => (
-                            <PlayerCard key={player.playerId} stats={player} />
-                        ))}
+                        {loading ? (
+                            <LoadingSpinner />
+                        ) : (
+                            players.map(player => (
+                                <PlayerCard key={player.playerId} stats={player} />
+                            ))
+                        )}
                     </div>
                 </div>
             ) : (

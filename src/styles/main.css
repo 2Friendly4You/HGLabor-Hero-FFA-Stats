@@ -4,10 +4,22 @@ body {
     min-height: 100vh;
     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .App {
     min-height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 1400px;
     padding: 2rem;
 }
 
@@ -47,8 +59,8 @@ body {
 
 .player-card h2 {
     color: #90caf9;
-    margin-bottom: 1.5rem;
-    font-size: 1.2rem;
+    margin: 0;
+    font-size: 1.4rem;
     text-align: center;
 }
 
@@ -166,4 +178,60 @@ select option {
 /* Add placeholder styling */
 ::placeholder {
     color: rgba(255, 255, 255, 0.5);
+}
+
+.loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-left-color: #90caf9;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.player-card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    justify-content: center;
+}
+
+.player-head {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    image-rendering: pixelated;
+}
+
+.profile-loading {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.player-identity {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.player-uuid {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    font-family: monospace;
 }
