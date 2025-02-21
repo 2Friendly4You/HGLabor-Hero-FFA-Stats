@@ -22,3 +22,5 @@ export interface HeroAbilities {
         };
     };
 }
+
+export type SortOption = 'kills' | 'xp' | 'deaths' | 'currentKillStreak' | 'highestKillStreak' | 'bounty';

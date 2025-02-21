@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { PlayerStats } from "../types/ApiTypes";
+import { FaTrophy, FaSkull, FaBolt, FaChartLine, FaFire, FaStar } from 'react-icons/fa';
+import { getPlayerFromCache, cachePlayer } from '../utils/cache';
 
 interface PlayerCardProps {
   stats: PlayerStats;
@@ -22,8 +24,9 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ stats }) => {
     setProfileLoading(true);
     
     // Check cache first
-    if (profileCache.has(stats.playerId)) {
-      setProfile(profileCache.get(stats.playerId)!);
+    const cached = getPlayerFromCache(stats.playerId);
+    if (cached) {
+      setProfile(cached);
       setProfileLoading(false);
       return;
     }
@@ -38,7 +41,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ stats }) => {
           name: data.username,
           id: data.uuid
         };
-        profileCache.set(stats.playerId, profileData);
+        cachePlayer(stats.playerId, profileData);
         setProfile(profileData);
       })
       .catch(() => setProfile(null))
@@ -71,12 +74,12 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ stats }) => {
         )}
       </div>
       <div className="stats-grid">
-        <div>XP: {stats.xp}</div>
-        <div>Kills: {stats.kills}</div>
-        <div>Deaths: {stats.deaths}</div>
-        <div>K/D: {kdr}</div>
-        <div>Highest Streak: {stats.highestKillStreak}</div>
-        <div>Current Streak: {stats.currentKillStreak}</div>
+        <div><FaStar className="stat-icon" /> XP: {stats.xp}</div>
+        <div><FaBolt className="stat-icon" /> Kills: {stats.kills}</div>
+        <div><FaSkull className="stat-icon" /> Deaths: {stats.deaths}</div>
+        <div><FaChartLine className="stat-icon" /> K/D: {kdr}</div>
+        <div><FaTrophy className="stat-icon" /> Highest Streak: {stats.highestKillStreak}</div>
+        <div><FaFire className="stat-icon" /> Current Streak: {stats.currentKillStreak}</div>
       </div>
     </div>
   );

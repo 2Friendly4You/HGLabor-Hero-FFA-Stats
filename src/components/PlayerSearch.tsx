@@ -12,13 +12,28 @@ export const PlayerSearch: React.FC = () => {
     const handleSearch = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`https://api.hglabor.de/stats/ffa/${playerId}`);
-            if (!response.ok) {
-                throw new Error('Player not found');
+            setError('');
+
+            let searchUUID = playerId;
+            
+            // If input doesn't look like a UUID, try to get UUID from username
+            if (!playerId.includes('-') && playerId.length < 32) {
+                try {
+                    const profileRes = await fetch(`https://api.ashcon.app/mojang/v2/user/${playerId}`);
+                    if (!profileRes.ok) throw new Error('Player not found');
+                    const profileData = await profileRes.json();
+                    searchUUID = profileData.uuid;
+                } catch (err) {
+                    setError('Player not found');
+                    setLoading(false);
+                    return;
+                }
             }
+
+            const response = await fetch(`https://api.hglabor.de/stats/ffa/${searchUUID}`);
+            if (!response.ok) throw new Error('Player not found');
             const data = await response.json();
             setPlayerData(data);
-            setError('');
         } catch (err) {
             setError('Player not found');
             setPlayerData(null);
@@ -34,7 +49,7 @@ export const PlayerSearch: React.FC = () => {
                     type="text"
                     value={playerId}
                     onChange={(e) => setPlayerId(e.target.value)}
-                    placeholder="Enter player UUID"
+                    placeholder="Enter player name or UUID"
                 />
                 <button onClick={handleSearch}>Search</button>
             </div>
