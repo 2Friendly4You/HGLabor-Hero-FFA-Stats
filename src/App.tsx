@@ -5,7 +5,9 @@ function App() {
     return (
         <div className="App">
             <div className="container">
-                <Leaderboard />
+                <main className="main-content">
+                    <Leaderboard />
+                </main>
                 <footer className="footer">
                     <div className="footer-content">
                         <div className="footer-buttons">
