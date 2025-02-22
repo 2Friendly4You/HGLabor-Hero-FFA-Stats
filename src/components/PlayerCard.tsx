@@ -13,9 +13,6 @@ interface MinecraftProfile {
   id: string;
 }
 
-// Add cache for player profiles
-const profileCache = new Map<string, MinecraftProfile>();
-
 export const PlayerCard: React.FC<PlayerCardProps> = ({ stats, rank }) => {
   const [profile, setProfile] = useState<MinecraftProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
