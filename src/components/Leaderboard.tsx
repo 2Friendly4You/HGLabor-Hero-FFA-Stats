@@ -3,7 +3,7 @@ import { PlayerStats, SortOption } from '../types/ApiTypes';
 import { PlayerCard } from './PlayerCard';
 import { PlayerSearch } from './PlayerSearch';
 import { LoadingSpinner } from './LoadingSpinner';
-import { FaTrophy, FaSkull, FaBolt, FaChartLine, FaFire, FaStar, FaCoins, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaTrophy, FaSkull, FaBolt, FaFire, FaStar, FaCoins, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { Settings } from './Settings';
 
 const PaginationControls: React.FC<{
