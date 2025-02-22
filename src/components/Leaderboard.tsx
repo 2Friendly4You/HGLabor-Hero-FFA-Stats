@@ -41,6 +41,17 @@ export const Leaderboard: React.FC = () => {
     const [hasNextPage, setHasNextPage] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    const getSortIcon = (sortValue: SortOption) => {
+        switch (sortValue) {
+            case 'kills': return <FaBolt />;
+            case 'xp': return <FaStar />;
+            case 'deaths': return <FaSkull />;
+            case 'currentKillStreak': return <FaFire />;
+            case 'highestKillStreak': return <FaTrophy />;
+            case 'bounty': return <FaCoins />;
+        }
+    };
+
     useEffect(() => {
         setLoading(true);
         setError(null);
@@ -103,14 +114,17 @@ export const Leaderboard: React.FC = () => {
             </div>
             {activeTab === 'leaderboard' ? (
                 <div className="leaderboard-content">
-                    <select value={sort} onChange={(e) => setSort(e.target.value as SortOption)}>
-                        <option value="kills"><FaBolt /> Sort by Kills</option>
-                        <option value="xp"><FaStar /> Sort by XP</option>
-                        <option value="deaths"><FaSkull /> Sort by Deaths</option>
-                        <option value="currentKillStreak"><FaFire /> Sort by Current Streak</option>
-                        <option value="highestKillStreak"><FaTrophy /> Sort by Highest Streak</option>
-                        <option value="bounty"><FaCoins /> Sort by Bounty</option>
-                    </select>
+                    <div className="sort-container">
+                        <div className="sort-icon">{getSortIcon(sort)}</div>
+                        <select value={sort} onChange={(e) => setSort(e.target.value as SortOption)}>
+                            <option value="kills">Sort by Kills</option>
+                            <option value="xp">Sort by XP</option>
+                            <option value="deaths">Sort by Deaths</option>
+                            <option value="currentKillStreak">Sort by Current Streak</option>
+                            <option value="highestKillStreak">Sort by Highest Streak</option>
+                            <option value="bounty">Sort by Bounty</option>
+                        </select>
+                    </div>
                     <PaginationControls 
                         currentPage={currentPage}
                         hasNextPage={hasNextPage}
@@ -124,8 +138,12 @@ export const Leaderboard: React.FC = () => {
                         ) : error ? (
                             <div className="no-data-message">{error}</div>
                         ) : (
-                            players.map(player => (
-                                <PlayerCard key={player.playerId} stats={player} />
+                            players.map((player, index) => (
+                                <PlayerCard 
+                                    key={player.playerId} 
+                                    stats={player} 
+                                    rank={(currentPage - 1) * 100 + index + 1}
+                                />
                             ))
                         )}
                     </div>

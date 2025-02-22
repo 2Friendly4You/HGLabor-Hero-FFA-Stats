@@ -1,50 +1,95 @@
-# React + TypeScript + Vite
+# 🎮 HGLabor Hero FFA Stats
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)](https://vitejs.dev/)
 
-Currently, two official plugins are available:
+A modern web application to track and display player statistics for HGLabor's Hero FFA game mode. Built with React, TypeScript, and Vite.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ Features
 
-## Expanding the ESLint configuration
+- 📊 Real-time leaderboard with multiple sorting options
+- 🔍 Player search by username or UUID
+- 📱 Responsive design for all devices
+- 💫 Smooth animations and transitions
+- 🎨 Beautiful, modern UI with glassmorphism effects
+- 🔄 Efficient caching system for player data
+- 📈 Detailed player statistics display
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## 🚀 Getting Started
 
-- Configure the top-level `parserOptions` property like this:
+### Prerequisites
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- Node.js (version 16 or higher)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository
+```bash
+git clone https://github.com/2Friendly4You/HGLabor-Hero-FFA-Stats
+cd hglabor-hero-ffa-stats
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+2. Install dependencies
+```bash
+npm install
+# or
+yarn
 ```
+
+3. Start the development server
+```bash
+npm run dev
+# or
+yarn dev
+```
+
+The application will be available at `http://localhost:5173`
+
+## 🛠️ Built With
+
+- **React** - UI Framework
+- **TypeScript** - Programming Language
+- **Vite** - Build Tool
+- **React Icons** - Icon Library
+- **CSS3** - Styling with modern features
+  - Custom Properties
+  - Flexbox
+  - Grid
+  - Animations
+  - Glassmorphism effects
+
+## 🔄 API Integration
+
+The application integrates with two main APIs:
+- **HGLabor API** - For player statistics
+- **Mojang API** - For player profile information
+
+## 🎨 Features in Detail
+
+### Leaderboard
+- Multiple sorting options (kills, XP, deaths, etc.)
+- Pagination support
+- Real-time updates
+- Player rankings
+
+### Player Search
+- Search by username or UUID
+- Detailed player statistics
+- Avatar display
+- Kill/Death ratio calculation
+
+### Player Caching
+- Local storage implementation
+- Automatic cache invalidation
+- Improved performance
+- Reduced API calls
+
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to submit pull requests or open issues.
+
+## 📜 License
+
+Coming soon.

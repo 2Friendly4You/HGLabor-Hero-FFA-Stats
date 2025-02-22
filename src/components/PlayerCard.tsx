@@ -5,6 +5,7 @@ import { getPlayerFromCache, cachePlayer } from '../utils/cache';
 
 interface PlayerCardProps {
   stats: PlayerStats;
+  rank?: number;  // Make optional to maintain compatibility
 }
 
 interface MinecraftProfile {
@@ -15,7 +16,7 @@ interface MinecraftProfile {
 // Add cache for player profiles
 const profileCache = new Map<string, MinecraftProfile>();
 
-export const PlayerCard: React.FC<PlayerCardProps> = ({ stats }) => {
+export const PlayerCard: React.FC<PlayerCardProps> = ({ stats, rank }) => {
   const [profile, setProfile] = useState<MinecraftProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const kdr = (stats.kills / Math.max(stats.deaths, 1)).toFixed(2);
@@ -55,6 +56,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ stats }) => {
           <div className="profile-loading">Loading...</div>
         ) : profile ? (
           <>
+            {rank && <div className="rank-number">#{rank}</div>}
             <img
               className="player-head"
               src={`https://crafatar.com/avatars/${stats.playerId}?overlay=true`}
