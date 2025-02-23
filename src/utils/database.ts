@@ -18,16 +18,21 @@ interface DatabaseCache {
             lastUpdated: number;
         };
     };
+    isInitialLoadComplete?: boolean;
 }
 
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 const DB_CACHE_KEY = 'hglabor_ffa_db';
+const MAX_PAGES_TO_LOAD = 10; // Adjust based on typical data size
 
 class Database {
     private cache: DatabaseCache;
 
     constructor() {
         this.cache = this.loadCache();
+        if (!this.cache.isInitialLoadComplete) {
+            this.initializeCache();
+        }
     }
 
     private loadCache(): DatabaseCache {
@@ -45,6 +50,53 @@ class Database {
 
     private isDataStale(timestamp: number): boolean {
         return Date.now() - timestamp > CACHE_DURATION;
+    }
+
+    private async initializeCache(): Promise<void> {
+        const sortOptions: SortOption[] = ['kills', 'xp', 'deaths', 'currentKillStreak', 'highestKillStreak', 'bounty'];
+        
+        // Load first page of each sort option to get initial data quickly
+        await Promise.all(sortOptions.map(sort => this.getLeaderboard(sort, 1)));
+
+        // Background load remaining pages
+        setTimeout(async () => {
+            try {
+                for (const sort of sortOptions) {
+                    for (let page = 2; page <= MAX_PAGES_TO_LOAD; page++) {
+                        const response = await fetch(`https://api.hglabor.de/stats/ffa/top?sort=${sort}&page=${page}`);
+                        if (!response.ok || response.status === 404) break;
+                        
+                        const players: PlayerStats[] = await response.json();
+                        if (players.length === 0) break;
+
+                        // Cache the data
+                        if (!this.cache.leaderboard[sort]) {
+                            this.cache.leaderboard[sort] = { pages: {}, lastUpdated: Date.now() };
+                        }
+                        
+                        this.cache.leaderboard[sort]!.pages[page] = players.map(player => ({
+                            playerId: player.playerId,
+                            sortValue: player[sort] as number
+                        }));
+
+                        players.forEach(player => {
+                            this.cache.players[player.playerId] = {
+                                data: player,
+                                lastUpdated: Date.now()
+                            };
+                        });
+
+                        // Small delay to not overwhelm the API
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                }
+
+                this.cache.isInitialLoadComplete = true;
+                this.saveCache();
+            } catch (error) {
+                console.error('Background cache loading failed:', error);
+            }
+        }, 1000);
     }
 
     async getLeaderboard(sort: SortOption, page: number): Promise<PlayerStats[]> {
@@ -108,9 +160,18 @@ class Database {
         return playerData;
     }
 
-    clearCache(): void {
-        this.cache = { leaderboard: {}, players: {} };
+    clearLeaderboardCache(): void {
+        this.cache.leaderboard = {};
+        this.cache.isInitialLoadComplete = false;
         this.saveCache();
+        this.initializeCache();
+    }
+
+    clearAllCache(): void {
+        this.cache = { leaderboard: {}, players: {} };
+        this.cache.isInitialLoadComplete = false;
+        this.saveCache();
+        this.initializeCache();
     }
 }
 
