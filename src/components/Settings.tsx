@@ -5,11 +5,11 @@ import { db } from '../utils/database';
 export const Settings: React.FC = () => {
     const handleClearPlayerCache = () => {
         clearPlayerCache();
-        alert('Player cache cleared successfully!');
+        alert('Player profile cache cleared successfully!');
     };
 
     const handleClearLeaderboardCache = () => {
-        db.clearLeaderboardCache();
+        db.clearCache();
         alert('Leaderboard cache cleared successfully! New data will be loaded in the background.');
     };
 
@@ -19,17 +19,17 @@ export const Settings: React.FC = () => {
             <div className="settings-group">
                 <h3>Cache Management</h3>
                 <button onClick={handleClearPlayerCache} className="settings-button">
-                    Clear Player Cache
+                    Clear Player Profile Cache
                 </button>
                 <p className="settings-description">
                     Clears cached player names and pictures. New data will be fetched on next view.
                 </p>
                 
                 <button onClick={handleClearLeaderboardCache} className="settings-button">
-                    Clear Leaderboard Cache
+                    Clear Stats Cache
                 </button>
                 <p className="settings-description">
-                    Clears cached leaderboard data and reloads it in the background. Data is cached for 24 hours.
+                    Clears all cached player statistics and reloads them in the background. Data is cached for 24 hours.
                 </p>
             </div>
         </div>

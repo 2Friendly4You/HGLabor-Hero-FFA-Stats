@@ -3,7 +3,7 @@ import { PlayerStats, SortOption } from '../types/ApiTypes';
 import { PlayerCard } from './PlayerCard';
 import { PlayerSearch } from './PlayerSearch';
 import { LoadingSpinner } from './LoadingSpinner';
-import { FaTrophy, FaSkull, FaBolt, FaFire, FaStar, FaCoins, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaTrophy, FaSkull, FaBolt, FaFire, FaStar, FaCoins, FaChevronLeft, FaChevronRight, FaChartLine } from 'react-icons/fa';
 import { Settings } from './Settings';
 import { db } from '../utils/database';
 
@@ -50,6 +50,7 @@ export const Leaderboard: React.FC = () => {
             case 'currentKillStreak': return <FaFire />;
             case 'highestKillStreak': return <FaTrophy />;
             case 'bounty': return <FaCoins />;
+            case 'kd': return <FaChartLine />;
         }
     };
 
@@ -60,7 +61,7 @@ export const Leaderboard: React.FC = () => {
         db.getLeaderboard(sort, currentPage)
             .then(data => {
                 setPlayers(data);
-                setHasNextPage(data.length === 100);
+                setHasNextPage(db.hasNextPage(sort, currentPage));
             })
             .catch(err => {
                 setError(err.message);
@@ -116,6 +117,7 @@ export const Leaderboard: React.FC = () => {
                             <option value="currentKillStreak">Sort by Current Streak</option>
                             <option value="highestKillStreak">Sort by Highest Streak</option>
                             <option value="bounty">Sort by Bounty</option>
+                            <option value="kd">Sort by K/D Ratio</option>
                         </select>
                     </div>
                     <PaginationControls 
@@ -131,13 +133,18 @@ export const Leaderboard: React.FC = () => {
                         ) : error ? (
                             <div className="no-data-message">{error}</div>
                         ) : (
-                            players.map((player, index) => (
-                                <PlayerCard 
-                                    key={player.playerId} 
-                                    stats={player} 
-                                    rank={(currentPage - 1) * 100 + index + 1}
-                                />
-                            ))
+                            players
+                                .filter((player, index, self) => 
+                                    // Ensure unique players by playerId
+                                    index === self.findIndex(p => p.playerId === player.playerId)
+                                )
+                                .map((player, index) => (
+                                    <PlayerCard 
+                                        key={`${player.playerId}-${currentPage}-${index}`}
+                                        stats={player} 
+                                        rank={(currentPage - 1) * 100 + index + 1}
+                                    />
+                                ))
                         )}
                     </div>
                     <PaginationControls 
