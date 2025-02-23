@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { PlayerCard } from './PlayerCard';
 import { PlayerStats } from '../types/ApiTypes';
 import { LoadingSpinner } from './LoadingSpinner';
+import { db } from '../utils/database';
 
 export const PlayerSearch: React.FC = () => {
     const [playerId, setPlayerId] = useState('');
@@ -30,9 +31,7 @@ export const PlayerSearch: React.FC = () => {
                 }
             }
 
-            const response = await fetch(`https://api.hglabor.de/stats/ffa/${searchUUID}`);
-            if (!response.ok) throw new Error('Player not found');
-            const data = await response.json();
+            const data = await db.getPlayer(searchUUID);
             setPlayerData(data);
         } catch (err) {
             setError('Player not found');

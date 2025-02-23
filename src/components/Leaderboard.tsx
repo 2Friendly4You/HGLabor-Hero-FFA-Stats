@@ -5,6 +5,7 @@ import { PlayerSearch } from './PlayerSearch';
 import { LoadingSpinner } from './LoadingSpinner';
 import { FaTrophy, FaSkull, FaBolt, FaFire, FaStar, FaCoins, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { Settings } from './Settings';
+import { db } from '../utils/database';
 
 const PaginationControls: React.FC<{
     currentPage: number;
@@ -55,19 +56,11 @@ export const Leaderboard: React.FC = () => {
     useEffect(() => {
         setLoading(true);
         setError(null);
-        fetch(`https://api.hglabor.de/stats/ffa/top?sort=${sort}&page=${currentPage}`)
-            .then(res => {
-                if (res.status === 404) {
-                    throw new Error('No data found');
-                }
-                if (!res.ok) {
-                    throw new Error('Failed to fetch data');
-                }
-                return res.json();
-            })
+        
+        db.getLeaderboard(sort, currentPage)
             .then(data => {
                 setPlayers(data);
-                setHasNextPage(data.length === 100); // If we get 100 items, there might be more
+                setHasNextPage(data.length === 100);
             })
             .catch(err => {
                 setError(err.message);
