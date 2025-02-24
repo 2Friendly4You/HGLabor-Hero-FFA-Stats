@@ -3,7 +3,7 @@
     backdrop-filter: blur(5px);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 1rem;
     color: var(--text);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -116,19 +116,19 @@
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.75rem;
-    margin: 0 -0.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.5rem;
+    margin: 0;
 }
 
 .stats-grid div {
     background: var(--secondary);
-    padding: 0.75rem;
+    padding: 0.5rem;
     border-radius: 8px;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     transition: all 0.2s ease;
     border: 1px solid transparent;
     margin: 0.25rem;
@@ -204,31 +204,63 @@
 
 @media (max-width: 768px) {
     .player-card {
-        padding: 1rem;
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+        max-width: 280px;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .player-card-header {
-        margin-bottom: 1rem;
-        padding-bottom: 0.75rem;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
+        gap: 0.75rem;
     }
 
     .player-identity h2 {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
 
     .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+    }
+
+    .stats-grid div {
+        margin: 0;
+        padding: 0.4rem 0.5rem;
+        font-size: 0.8rem;
     }
 
     .rank-number {
-        top: 0.75rem;
-        right: 0.75rem;
-        padding: 0.35rem 0.75rem;
-        font-size: 0.85rem;
+        top: 0.5rem;
+        right: 0.5rem;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
     }
 
     .player-head {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
+    }
+
+    .player-uuid.copy-uuid {
+        font-size: 0.8rem;
+        padding: 0.2rem 0.4rem;
+    }
+}
+
+@media (min-width: 769px) {
+    .player-card {
+        padding: 1.5rem;
+    }
+
+    .stats-grid {
+        gap: 0.75rem;
+    }
+
+    .stats-grid div {
+        padding: 0.75rem;
+        font-size: 0.9rem;
     }
 }

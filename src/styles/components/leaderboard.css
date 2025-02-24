@@ -1,17 +1,17 @@
 .leaderboard {
-    max-width: 1200px;
+    max-width: 800px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 1rem;
     backdrop-filter: blur(10px);
-    border-radius: 16px;
+    border-radius: 8px;
     border: 1px solid var(--border);
 }
 
 .leaderboard h1 {
     color: var(--text);
     text-align: center;
-    margin-bottom: 2rem;
-    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
@@ -25,7 +25,9 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin: 1rem 0;
+    margin: 0.5rem auto;
+    width: 100%;
+    max-width: 400px;
 }
 
 .sort-icon {
@@ -43,10 +45,10 @@
 
 .players-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
     width: 100%;
-    margin-top: 2rem;
+    margin-top: 1rem;
 }
 
 .no-data-message {
@@ -99,24 +101,28 @@
 
 @media (max-width: 768px) {
     .leaderboard {
-        padding: 0.75rem;
-        margin: 0;
+        padding: 0.5rem;
+        margin: 0 auto;
         border-radius: 8px;
+        max-width: 300px;
     }
 
     .leaderboard h1 {
-        font-size: 1.8rem;
-        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
     }
 
     .players-grid {
         grid-template-columns: 1fr;
-        gap: 1rem;
+        gap: 0.75rem;
+        margin-top: 0.75rem;
     }
 
     .pagination {
         flex-direction: column;
         gap: 0.5rem;
+        max-width: 280px;
+        margin: 0.75rem auto;
     }
 
     .pagination-button {
@@ -126,5 +132,28 @@
 
     .sort-container {
         width: 100%;
+        max-width: 280px;
+        padding: 0 0.5rem;
+    }
+}
+
+@media (min-width: 769px) {
+    .leaderboard {
+        padding: 2rem;
+        border-radius: 16px;
+    }
+
+    .leaderboard h1 {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .players-grid {
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .sort-container {
+        margin: 1rem auto;
     }
 }
