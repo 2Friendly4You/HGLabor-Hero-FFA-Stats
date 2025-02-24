@@ -54,7 +54,7 @@
     height: 100%;
     object-fit: contain;
     image-rendering: pixelated;
-    transform: scale(1.2);
+    transform: scale(1);  /* Changed from 1.2 to 1 to zoom out */
 }
 
 .player-info h1 {
