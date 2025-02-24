@@ -97,7 +97,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ stats, rank }) => {
                         {rank !== undefined && <div className="rank-number">#{rank}</div>}
                         <img
                             className="player-head"
-                            src={`https://crafatar.com/avatars/${stats.playerId}?overlay=true`}
+                            src={`https://crafatar.com/avatars/${stats.playerId}?overlay`}
                             alt={profile.name}
                             loading="lazy"
                             onError={(e) => {

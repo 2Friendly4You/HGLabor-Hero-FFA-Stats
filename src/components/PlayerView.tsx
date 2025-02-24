@@ -137,7 +137,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ playerId, onBack }) => {
                     ) : (
                         <img
                             className="player-skin"
-                            src={`https://crafatar.com/renders/body/${stats.playerId}?overlay=true`}
+                            src={`https://www.mc-heads.net/body/${stats.playerId}`}
                             alt={profile?.name || 'Player'}
                             onError={(e) => {
                                 e.currentTarget.src = 'default-skin.png';
