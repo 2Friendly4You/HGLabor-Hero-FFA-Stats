@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { PlayerStats } from "../types/ApiTypes";
-import { FaTrophy, FaSkull, FaBolt, FaChartLine, FaFire, FaStar } from 'react-icons/fa';
+import { FaTrophy, FaSkull, FaBolt, FaChartLine, FaFire, FaStar, FaCoins } from 'react-icons/fa';
 import { getPlayerFromCache, cachePlayer } from '../utils/cache';
 
 interface PlayerCardProps {
@@ -17,6 +17,18 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ stats, rank }) => {
     const [profile, setProfile] = useState<MinecraftProfile | null>(null);
     const [profileLoading, setProfileLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [copySuccess, setCopySuccess] = useState(false);
+
+    const handleCopyClick = async (e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevent triggering parent click handlers
+        try {
+            await navigator.clipboard.writeText(stats.playerId);
+            setCopySuccess(true);
+            setTimeout(() => setCopySuccess(false), 2000); // Reset after 2 seconds
+        } catch (err) {
+            console.error('Failed to copy:', err);
+        }
+    };
 
     // Calculate K/D with safety checks
     const kills = Math.max(0, stats?.kills || 0);
@@ -75,7 +87,10 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ stats, rank }) => {
                 ) : error ? (
                     <div className="player-identity">
                         <h2>Unknown Player</h2>
-                        <div className="player-uuid">{stats.playerId}</div>
+                        <div className="player-uuid copy-uuid" onClick={handleCopyClick}>
+                            {stats.playerId}
+                            {copySuccess && <span className="copy-tooltip">Copied!</span>}
+                        </div>
                     </div>
                 ) : profile ? (
                     <>
@@ -92,13 +107,19 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ stats, rank }) => {
                         />
                         <div className="player-identity">
                             <h2>{profile.name}</h2>
-                            <div className="player-uuid">{stats.playerId}</div>
+                            <div className="player-uuid copy-uuid" onClick={handleCopyClick}>
+                                {stats.playerId}
+                                {copySuccess && <span className="copy-tooltip">Copied!</span>}
+                            </div>
                         </div>
                     </>
                 ) : (
                     <div className="player-identity">
                         <h2>Unknown Player</h2>
-                        <div className="player-uuid">{stats.playerId}</div>
+                        <div className="player-uuid copy-uuid" onClick={handleCopyClick}>
+                            {stats.playerId}
+                            {copySuccess && <span className="copy-tooltip">Copied!</span>}
+                        </div>
                     </div>
                 )}
             </div>
@@ -109,6 +130,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ stats, rank }) => {
                 <div><FaChartLine className="stat-icon" /> K/D: {kdr}</div>
                 <div><FaTrophy className="stat-icon" /> Highest Streak: {Math.max(0, stats.highestKillStreak || 0)}</div>
                 <div><FaFire className="stat-icon" /> Current Streak: {Math.max(0, stats.currentKillStreak || 0)}</div>
+                <div><FaCoins className="stat-icon" /> Bounty: {Math.max(0, stats.bounty || 0)}</div>
             </div>
         </div>
     );

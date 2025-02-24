@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { PlayerStats } from "../types/ApiTypes";
-import { FaTrophy, FaSkull, FaBolt, FaChartLine, FaFire, FaStar, FaArrowLeft } from 'react-icons/fa';
+import { FaTrophy, FaSkull, FaBolt, FaChartLine, FaFire, FaStar, FaArrowLeft, FaCrown, FaCoins } from 'react-icons/fa';
 import { GiMagicPalm, GiWaterDrop, GiRock } from 'react-icons/gi';
 import { getPlayerFromCache, cachePlayer } from '../utils/cache';
 import { LoadingSpinner } from './LoadingSpinner';
@@ -16,11 +16,33 @@ interface PlayerViewProps {
     onBack: () => void;
 }
 
+type StatRanks = {
+    kills: number;
+    xp: number;
+    deaths: number;
+    currentKillStreak: number;
+    highestKillStreak: number;
+    bounty: number;
+    kd: number;
+}
+
 export const PlayerView: React.FC<PlayerViewProps> = ({ playerId, onBack }) => {
     const [stats, setStats] = useState<PlayerStats | null>(null);
     const [profile, setProfile] = useState<MinecraftProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [ranks, setRanks] = useState<StatRanks | null>(null);
+    const [copySuccess, setCopySuccess] = useState(false);
+
+    const handleCopyClick = async () => {
+        try {
+            await navigator.clipboard.writeText(playerId);
+            setCopySuccess(true);
+            setTimeout(() => setCopySuccess(false), 2000);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+        }
+    };
 
     useEffect(() => {
         const loadPlayerData = async () => {
@@ -31,6 +53,10 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ playerId, onBack }) => {
                 // Load player stats
                 const playerStats = await db.getPlayer(playerId);
                 setStats(playerStats);
+
+                // Load player ranks
+                const playerRanks = await db.getPlayerRanks(playerId);
+                setRanks(playerRanks as StatRanks);
 
                 // Load player profile
                 const cached = getPlayerFromCache(playerId);
@@ -87,6 +113,17 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ playerId, onBack }) => {
     const kataraXP = calculateHeroXP(stats.heroes.katara);
     const tophXP = calculateHeroXP(stats.heroes.toph);
 
+    const renderStatWithRank = (icon: React.ReactNode, label: string, value: number, rank: number) => (
+        <div className="stat-item">
+            <div className="stat-content">
+                {icon} {label}: {value}
+            </div>
+            <div className="stat-rank" title={`Rank #${rank}`}>
+                <FaCrown /> #{rank}
+            </div>
+        </div>
+    );
+
     return (
         <div className="player-view">
             <button onClick={onBack} className="back-button">
@@ -94,30 +131,44 @@ export const PlayerView: React.FC<PlayerViewProps> = ({ playerId, onBack }) => {
             </button>
             
             <div className="player-header">
-                <img
-                    className="player-head large"
-                    src={`https://crafatar.com/avatars/${stats.playerId}?overlay=true&size=128`}
-                    alt={profile?.name || 'Player'}
-                    onError={(e) => {
-                        e.currentTarget.src = 'default-skin.png';
-                        e.currentTarget.onerror = null;
-                    }}
-                />
+                <div className="player-skin-container">
+                    {loading ? (
+                        <LoadingSpinner />
+                    ) : (
+                        <img
+                            className="player-skin"
+                            src={`https://crafatar.com/renders/body/${stats.playerId}?overlay=true`}
+                            alt={profile?.name || 'Player'}
+                            onError={(e) => {
+                                e.currentTarget.src = 'default-skin.png';
+                                e.currentTarget.onerror = null;
+                            }}
+                        />
+                    )}
+                </div>
                 <div className="player-info">
                     <h1>{profile?.name || 'Unknown Player'}</h1>
-                    <div className="player-uuid">{stats.playerId}</div>
+                    <div className="player-uuid copy-uuid" onClick={handleCopyClick}>
+                        {stats.playerId}
+                        {copySuccess && <span className="copy-tooltip">Copied!</span>}
+                    </div>
                 </div>
             </div>
 
             <div className="stats-section">
                 <h2>General Statistics</h2>
                 <div className="stats-grid extended">
-                    <div><FaStar className="stat-icon" /> Total XP: {Math.max(0, stats.xp || 0)}</div>
-                    <div><FaBolt className="stat-icon" /> Kills: {kills}</div>
-                    <div><FaSkull className="stat-icon" /> Deaths: {deaths}</div>
-                    <div><FaChartLine className="stat-icon" /> K/D Ratio: {kdr}</div>
-                    <div><FaTrophy className="stat-icon" /> Highest Streak: {Math.max(0, stats.highestKillStreak || 0)}</div>
-                    <div><FaFire className="stat-icon" /> Current Streak: {Math.max(0, stats.currentKillStreak || 0)}</div>
+                    {ranks && (
+                        <>
+                            {renderStatWithRank(<FaStar className="stat-icon" />, "Total XP", Math.max(0, stats.xp || 0), ranks.xp)}
+                            {renderStatWithRank(<FaBolt className="stat-icon" />, "Kills", kills, ranks.kills)}
+                            {renderStatWithRank(<FaSkull className="stat-icon" />, "Deaths", deaths, ranks.deaths)}
+                            {renderStatWithRank(<FaChartLine className="stat-icon" />, "K/D Ratio", parseFloat(kdr), ranks.kd)}
+                            {renderStatWithRank(<FaTrophy className="stat-icon" />, "Highest Streak", Math.max(0, stats.highestKillStreak || 0), ranks.highestKillStreak)}
+                            {renderStatWithRank(<FaFire className="stat-icon" />, "Current Streak", Math.max(0, stats.currentKillStreak || 0), ranks.currentKillStreak)}
+                            {renderStatWithRank(<FaCoins className="stat-icon" />, "Bounty", Math.max(0, stats.bounty || 0), ranks.bounty)}
+                        </>
+                    )}
                 </div>
             </div>
 

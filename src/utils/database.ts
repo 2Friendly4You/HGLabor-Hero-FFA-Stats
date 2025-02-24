@@ -202,6 +202,56 @@ class Database {
         this.saveCache();
         this.loadingPromise = this.loadAllPlayers();
     }
+
+    private getPlayerRankForField(playerId: string, field: SortOption): number {
+        const validPlayers = this.cache.players.data
+            .map(p => this.sanitizePlayerData(p))
+            .filter(p => p.playerId && typeof p.playerId === 'string');
+
+        if (field === 'kd') {
+            const sortedPlayers = validPlayers.sort((a, b) => {
+                const kdA = this.calculateKDValue(a);
+                const kdB = this.calculateKDValue(b);
+                if (kdA === kdB) {
+                    return b.kills - a.kills;
+                }
+                return kdB - kdA;
+            });
+            return sortedPlayers.findIndex(p => p.playerId === playerId) + 1;
+        }
+
+        const sortedPlayers = validPlayers.sort((a, b) => {
+            const valA = a[field] || 0;
+            const valB = b[field] || 0;
+            if (valA === valB) {
+                return this.calculateKDValue(b) - this.calculateKDValue(a);
+            }
+            return valB - valA;
+        });
+        return sortedPlayers.findIndex(p => p.playerId === playerId) + 1;
+    }
+
+    async getPlayerRanks(playerId: string): Promise<Record<SortOption, number>> {
+        if (this.loadingPromise) {
+            await this.loadingPromise;
+        }
+
+        if (!this.cache.players?.data || this.isDataStale(this.cache.players.lastUpdated)) {
+            await this.loadAllPlayers();
+        }
+
+        const ranks: Record<SortOption, number> = {
+            kills: this.getPlayerRankForField(playerId, 'kills'),
+            deaths: this.getPlayerRankForField(playerId, 'deaths'),
+            xp: this.getPlayerRankForField(playerId, 'xp'),
+            currentKillStreak: this.getPlayerRankForField(playerId, 'currentKillStreak'),
+            highestKillStreak: this.getPlayerRankForField(playerId, 'highestKillStreak'),
+            bounty: this.getPlayerRankForField(playerId, 'bounty'),
+            kd: this.getPlayerRankForField(playerId, 'kd')
+        };
+
+        return ranks;
+    }
 }
 
 export const db = new Database();
