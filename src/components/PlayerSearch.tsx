@@ -4,7 +4,11 @@ import { PlayerStats } from '../types/ApiTypes';
 import { LoadingSpinner } from './LoadingSpinner';
 import { db } from '../utils/database';
 
-export const PlayerSearch: React.FC = () => {
+interface PlayerSearchProps {
+    onPlayerSelect?: (playerId: string) => void;
+}
+
+export const PlayerSearch: React.FC<PlayerSearchProps> = ({ onPlayerSelect }) => {
     const [playerId, setPlayerId] = useState('');
     const [playerData, setPlayerData] = useState<PlayerStats | null>(null);
     const [error, setError] = useState('');
@@ -54,7 +58,14 @@ export const PlayerSearch: React.FC = () => {
             </div>
             {loading && <LoadingSpinner />}
             {error && <div className="error">{error}</div>}
-            {playerData && <PlayerCard stats={playerData} />}
+            {playerData && (
+                <div 
+                    className="player-card-wrapper"
+                    onClick={() => onPlayerSelect?.(playerData.playerId)}
+                >
+                    <PlayerCard stats={playerData} />
+                </div>
+            )}
         </div>
     );
 };

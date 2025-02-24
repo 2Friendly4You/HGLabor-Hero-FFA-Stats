@@ -576,3 +576,134 @@ select option {
     padding-bottom: 2rem;
     margin-bottom: auto;
 }
+
+.player-card-wrapper {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.player-card-wrapper:hover {
+    transform: translateY(-5px);
+}
+
+.player-view {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.player-view .back-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    margin-bottom: 2rem;
+    transition: background 0.2s;
+}
+
+.player-view .back-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.player-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+}
+
+.player-head.large {
+    width: 128px;
+    height: 128px;
+    border-radius: 16px;
+}
+
+.player-info h1 {
+    font-size: 2.5rem;
+    margin: 0;
+    color: #90caf9;
+}
+
+.player-uuid {
+    color: rgba(255, 255, 255, 0.6);
+    font-family: monospace;
+}
+
+.stats-section, .hero-stats-section {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+}
+
+.stats-section h2, .hero-stats-section h2 {
+    color: #90caf9;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+.stats-grid.extended {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.hero-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.hero-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hero-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #90caf9;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+}
+
+.hero-xp {
+    color: #4fc3f7;
+    margin-bottom: 1rem;
+    font-weight: bold;
+}
+
+.abilities-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.ability-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+}
+
+.ability-name {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.ability-xp {
+    color: #4fc3f7;
+}

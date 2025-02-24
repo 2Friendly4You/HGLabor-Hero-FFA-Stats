@@ -5,6 +5,7 @@ import { PlayerSearch } from './PlayerSearch';
 import { LoadingSpinner } from './LoadingSpinner';
 import { FaTrophy, FaSkull, FaBolt, FaFire, FaStar, FaCoins, FaChevronLeft, FaChevronRight, FaChartLine } from 'react-icons/fa';
 import { Settings } from './Settings';
+import { PlayerView } from './PlayerView';
 import { db } from '../utils/database';
 
 const PaginationControls: React.FC<{
@@ -36,7 +37,8 @@ const PaginationControls: React.FC<{
 export const Leaderboard: React.FC = () => {
     const [players, setPlayers] = useState<PlayerStats[]>([]);
     const [sort, setSort] = useState<SortOption>('kills');
-    const [activeTab, setActiveTab] = useState<'leaderboard' | 'search' | 'settings'>('leaderboard');
+    const [activeTab, setActiveTab] = useState<'leaderboard' | 'search' | 'settings' | 'player'>('leaderboard');
+    const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [hasNextPage, setHasNextPage] = useState(true);
@@ -52,6 +54,16 @@ export const Leaderboard: React.FC = () => {
             case 'bounty': return <FaCoins />;
             case 'kd': return <FaChartLine />;
         }
+    };
+
+    const handlePlayerClick = (playerId: string) => {
+        setSelectedPlayerId(playerId);
+        setActiveTab('player');
+    };
+
+    const handleBackFromPlayer = () => {
+        setSelectedPlayerId(null);
+        setActiveTab('leaderboard');
     };
 
     useEffect(() => {
@@ -86,26 +98,28 @@ export const Leaderboard: React.FC = () => {
     return (
         <div className="leaderboard">
             <h1>Hero FFA Stats</h1>
-            <div className="tabs">
-                <button 
-                    className={activeTab === 'leaderboard' ? 'active' : ''} 
-                    onClick={() => setActiveTab('leaderboard')}
-                >
-                    Leaderboard
-                </button>
-                <button 
-                    className={activeTab === 'search' ? 'active' : ''} 
-                    onClick={() => setActiveTab('search')}
-                >
-                    Player Search
-                </button>
-                <button 
-                    className={activeTab === 'settings' ? 'active' : ''} 
-                    onClick={() => setActiveTab('settings')}
-                >
-                    Settings
-                </button>
-            </div>
+            {activeTab !== 'player' && (
+                <div className="tabs">
+                    <button 
+                        className={activeTab === 'leaderboard' ? 'active' : ''} 
+                        onClick={() => setActiveTab('leaderboard')}
+                    >
+                        Leaderboard
+                    </button>
+                    <button 
+                        className={activeTab === 'search' ? 'active' : ''} 
+                        onClick={() => setActiveTab('search')}
+                    >
+                        Player Search
+                    </button>
+                    <button 
+                        className={activeTab === 'settings' ? 'active' : ''} 
+                        onClick={() => setActiveTab('settings')}
+                    >
+                        Settings
+                    </button>
+                </div>
+            )}
             {activeTab === 'leaderboard' ? (
                 <div className="leaderboard-content">
                     <div className="sort-container">
@@ -139,11 +153,16 @@ export const Leaderboard: React.FC = () => {
                                     index === self.findIndex(p => p.playerId === player.playerId)
                                 )
                                 .map((player, index) => (
-                                    <PlayerCard 
+                                    <div 
                                         key={`${player.playerId}-${currentPage}-${index}`}
-                                        stats={player} 
-                                        rank={(currentPage - 1) * 100 + index + 1}
-                                    />
+                                        onClick={() => handlePlayerClick(player.playerId)}
+                                        className="player-card-wrapper"
+                                    >
+                                        <PlayerCard 
+                                            stats={player} 
+                                            rank={(currentPage - 1) * 100 + index + 1}
+                                        />
+                                    </div>
                                 ))
                         )}
                     </div>
@@ -156,7 +175,9 @@ export const Leaderboard: React.FC = () => {
                     />
                 </div>
             ) : activeTab === 'search' ? (
-                <PlayerSearch />
+                <PlayerSearch onPlayerSelect={handlePlayerClick} />
+            ) : activeTab === 'player' && selectedPlayerId ? (
+                <PlayerView playerId={selectedPlayerId} onBack={handleBackFromPlayer} />
             ) : (
                 <Settings />
             )}
