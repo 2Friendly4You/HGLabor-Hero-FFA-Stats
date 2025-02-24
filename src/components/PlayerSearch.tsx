@@ -119,6 +119,11 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({ onPlayerSelect }) =>
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            updateMatches();
+                        }
+                    }}
                     placeholder="Enter player name"
                     className="search-input"
                 />
