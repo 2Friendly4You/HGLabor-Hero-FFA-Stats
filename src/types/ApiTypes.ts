@@ -24,3 +24,15 @@ export interface HeroAbilities {
 }
 
 export type SortOption = 'kills' | 'xp' | 'deaths' | 'currentKillStreak' | 'highestKillStreak' | 'bounty' | 'kd';
+
+interface DatabaseEventMap {
+    'database-updated': CustomEvent<{ oldData: PlayerStats[]; newData: PlayerStats[] }>;
+    'database-load-complete': CustomEvent<void>;
+    'database-pagination-update': CustomEvent<void>;
+}
+
+declare global {
+    interface WindowEventMap extends DatabaseEventMap {}
+}
+
+export type { DatabaseEventMap };

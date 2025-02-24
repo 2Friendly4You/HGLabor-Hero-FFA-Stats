@@ -4,33 +4,45 @@ interface DatabaseCache {
     players: {
         data: PlayerStats[];
         lastUpdated: number;
+        isFullyLoaded: boolean;
     };
 }
 
-const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
 const DB_CACHE_KEY = 'hglabor_ffa_db';
 const ITEMS_PER_PAGE = 100;
+const BACKGROUND_REFRESH_INTERVAL = 60 * 60 * 1000; // 1 hour
 
 class Database {
     private cache: DatabaseCache;
     private loadingPromise: Promise<void> | null = null;
+    private isLoadingMore: boolean = false;
+    private backgroundRefreshTimeout: number | null = null;
 
     constructor() {
         this.cache = this.loadCache();
+        
+        // Initial load
         if (!this.cache.players?.data || this.isDataStale(this.cache.players.lastUpdated)) {
-            this.loadingPromise = this.loadAllPlayers();
+            this.loadInitialPlayers();
+        } else if (!this.cache.players.isFullyLoaded) {
+            // Resume loading in background if previous load was incomplete
+            this.loadRemainingPlayersInBackground();
         }
+
+        // Set up background refresh
+        this.setupBackgroundRefresh();
     }
 
     private loadCache(): DatabaseCache {
         try {
             const cached = localStorage.getItem(DB_CACHE_KEY);
             return cached ? JSON.parse(cached) : {
-                players: { data: [], lastUpdated: 0 }
+                players: { data: [], lastUpdated: 0, isFullyLoaded: false }
             };
         } catch {
             return {
-                players: { data: [], lastUpdated: 0 }
+                players: { data: [], lastUpdated: 0, isFullyLoaded: false }
             };
         }
     }
@@ -41,6 +53,101 @@ class Database {
 
     private isDataStale(timestamp: number): boolean {
         return Date.now() - timestamp > CACHE_DURATION;
+    }
+
+    private setupBackgroundRefresh(): void {
+        if (this.backgroundRefreshTimeout) {
+            clearInterval(this.backgroundRefreshTimeout);
+        }
+
+        this.backgroundRefreshTimeout = window.setInterval(() => {
+            this.refreshDataInBackground();
+        }, BACKGROUND_REFRESH_INTERVAL);
+    }
+
+    private async refreshDataInBackground(): Promise<void> {
+        try {
+            const oldData = [...this.cache.players.data];
+            await this.loadAllPlayers();
+            
+            // Notify any listeners that data has been updated
+            window.dispatchEvent(new CustomEvent('database-updated', {
+                detail: { oldData, newData: this.cache.players.data }
+            }));
+        } catch (error) {
+            console.error('Background refresh failed:', error);
+        }
+    }
+
+    private async loadInitialPlayers(): Promise<void> {
+        try {
+            const response = await fetch('https://api.hglabor.de/stats/ffa/top?sort=kills&page=1');
+            if (!response.ok) throw new Error('Failed to load initial players');
+            
+            const players: PlayerStats[] = await response.json();
+            
+            this.cache.players = {
+                data: this.deduplicatePlayers(players),
+                lastUpdated: Date.now(),
+                isFullyLoaded: false
+            };
+            
+            this.saveCache();
+            
+            // Start loading remaining players in background
+            this.loadRemainingPlayersInBackground();
+        } catch (error) {
+            console.error('Failed to load initial players:', error);
+            throw error;
+        }
+    }
+
+    private async loadRemainingPlayersInBackground(): Promise<void> {
+        if (this.isLoadingMore) return;
+        
+        console.debug('Starting background load...');
+        this.isLoadingMore = true;
+        let page = 2; // Start from page 2 since page 1 is already loaded
+        
+        try {
+            while (true) {
+                console.debug('Loading page:', page);
+                const response = await fetch(`https://api.hglabor.de/stats/ffa/top?sort=kills&page=${page}`);
+                if (!response.ok) break;
+                
+                const players: PlayerStats[] = await response.json();
+                if (players.length === 0) break;
+
+                // Update cache with new players
+                this.cache.players.data = this.deduplicatePlayers([
+                    ...this.cache.players.data,
+                    ...players
+                ]);
+                
+                this.saveCache();
+                console.debug('Updated cache with page:', page);
+
+                // Dispatch update event after each page is loaded
+                window.dispatchEvent(new CustomEvent('database-pagination-update'));
+                
+                page++;
+
+                // Small delay to not overwhelm the API
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            console.debug('Background loading complete');
+            this.cache.players.isFullyLoaded = true;
+            this.saveCache();
+            
+            // Dispatch an event to notify that loading is complete
+            window.dispatchEvent(new CustomEvent('database-load-complete'));
+            window.dispatchEvent(new CustomEvent('database-pagination-update'));
+        } catch (error) {
+            console.error('Failed to load remaining players:', error);
+        } finally {
+            this.isLoadingMore = false;
+        }
     }
 
     private deduplicatePlayers(players: PlayerStats[]): PlayerStats[] {
@@ -107,7 +214,8 @@ class Database {
             // Deduplicate and sanitize all players before saving
             this.cache.players = {
                 data: this.deduplicatePlayers(allPlayers),
-                lastUpdated: Date.now()
+                lastUpdated: Date.now(),
+                isFullyLoaded: true
             };
             
             this.saveCache();
@@ -154,12 +262,14 @@ class Database {
     }
 
     async getLeaderboard(sort: SortOption, page: number): Promise<PlayerStats[]> {
-        if (this.loadingPromise) {
-            await this.loadingPromise;
+        // If we don't have any data yet, load initial data
+        if (this.cache.players.data.length === 0) {
+            await this.loadInitialPlayers();
         }
-
-        if (!this.cache.players?.data || this.isDataStale(this.cache.players.lastUpdated)) {
-            await this.loadAllPlayers();
+        
+        // If data is stale, trigger a background refresh but still return current data
+        if (this.isDataStale(this.cache.players.lastUpdated)) {
+            this.refreshDataInBackground();
         }
 
         const sortedPlayers = this.getSortedPlayers(sort);
@@ -191,13 +301,23 @@ class Database {
     }
 
     hasNextPage(sort: SortOption, currentPage: number): boolean {
-        const totalPlayers = this.getSortedPlayers(sort).length;
-        return totalPlayers > currentPage * ITEMS_PER_PAGE;
+        // Ensure we have proper pagination calculation even during background loading
+        const sortedPlayers = this.getSortedPlayers(sort);
+        const nextPageStart = currentPage * ITEMS_PER_PAGE;
+        const hasMore = sortedPlayers.length > nextPageStart;
+        
+        // If we're still loading and there are players on the current page,
+        // assume there might be a next page
+        if (!this.isFullyLoaded() && sortedPlayers.length >= currentPage * ITEMS_PER_PAGE) {
+            return true;
+        }
+        
+        return hasMore;
     }
 
     clearCache(): void {
         this.cache = {
-            players: { data: [], lastUpdated: 0 }
+            players: { data: [], lastUpdated: 0, isFullyLoaded: false }
         };
         this.saveCache();
         this.loadingPromise = this.loadAllPlayers();
@@ -251,6 +371,18 @@ class Database {
         };
 
         return ranks;
+    }
+
+    isFullyLoaded(): boolean {
+        const isLoaded = this.cache.players.isFullyLoaded;
+        console.debug('Database fully loaded:', isLoaded);
+        return isLoaded;
+    }
+
+    isInitialLoadComplete(): boolean {
+        const isComplete = this.cache.players.data.length > 0;
+        console.debug('Initial load complete:', isComplete);
+        return isComplete;
     }
 }
 
