@@ -1,0 +1,130 @@
+.leaderboard {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+}
+
+.leaderboard h1 {
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.leaderboard-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sort-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.sort-icon {
+    color: var(--accent);
+    font-size: 1.2rem;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--secondary);
+    border-radius: 4px;
+    padding: 0.25rem;
+}
+
+.players-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    margin-top: 2rem;
+}
+
+.no-data-message {
+    color: var(--text);
+    text-align: center;
+    padding: 2rem;
+    background: var(--secondary);
+    border-radius: 8px;
+    width: 100%;
+    font-size: 1.2rem;
+    grid-column: 1 / -1;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.pagination-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(144, 202, 249, 0.2);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pagination-button:hover:not(:disabled) {
+    background: rgba(144, 202, 249, 0.3);
+}
+
+.pagination-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-number {
+    color: var(--text);
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    background: var(--secondary);
+    border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+    .leaderboard {
+        padding: 0.75rem;
+        margin: 0;
+        border-radius: 8px;
+    }
+
+    .leaderboard h1 {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .players-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .pagination {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .pagination-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .sort-container {
+        width: 100%;
+    }
+}
