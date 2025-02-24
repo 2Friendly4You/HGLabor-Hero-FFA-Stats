@@ -35,12 +35,14 @@
 
 .player-card-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 1rem;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--border);
     position: relative;
+    text-align: left;
+    justify-content: flex-start;
 }
 
 .player-head {
@@ -58,7 +60,11 @@
 
 .player-identity {
     flex: 1;
-    min-width: 0; /* Prevent text overflow */
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
 }
 
 .player-identity h2 {
@@ -68,14 +74,44 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    text-align: left;
+    width: 100%;
 }
 
-.player-uuid {
+.player-uuid.copy-uuid {
     color: rgba(255, 255, 255, 0.6);
     font-size: 0.85rem;
     font-family: monospace;
     margin-top: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    background: var(--secondary);
+    width: auto;
+    align-self: flex-start;
+}
+
+.player-uuid.copy-uuid:hover {
+    background: var(--hover-bg);
+}
+
+.copy-uuid {
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    background: var(--secondary);
+    transition: all 0.2s ease;
+}
+
+.copy-uuid:hover {
+    background: var(--hover-bg);
 }
 
 .stats-grid {
@@ -149,24 +185,6 @@
     color: rgba(255, 255, 255, 0.6);
     padding: 1rem;
     font-style: italic;
-}
-
-.copy-uuid {
-    cursor: pointer;
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    background: var(--secondary);
-    transition: all 0.2s ease;
-    font-size: 0.85rem;
-    margin-top: 0.5rem;
-}
-
-.copy-uuid:hover {
-    background: var(--hover-bg);
 }
 
 .copy-tooltip {
